@@ -1,0 +1,749 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#102a43">
+  <title>Adding and Subtracting Fractions – Common Denominators</title>
+  <style>
+    :root {
+      --navy: #102a43;
+      --blue: #1976d2;
+      --blue-dark: #0d5fb5;
+      --sky: #eaf5ff;
+      --ink: #172b3a;
+      --muted: #5a6f7f;
+      --line: #c8d9e8;
+      --card: #ffffff;
+      --green: #168447;
+      --green-bg: #e8f7ef;
+      --red: #c73737;
+      --red-bg: #fff0f0;
+      --gold: #e8a317;
+      --shadow: 0 14px 38px rgba(16, 42, 67, .14);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 5%, rgba(25, 118, 210, .16), transparent 28rem),
+        radial-gradient(circle at 90% 95%, rgba(22, 132, 71, .11), transparent 30rem),
+        #f3f8fc;
+    }
+
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+
+    .app {
+      width: min(1040px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 26px 0 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(1.65rem, 4vw, 2.55rem);
+      line-height: 1.12;
+      letter-spacing: -.035em;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: clamp(.95rem, 2vw, 1.08rem);
+    }
+
+    .mode-picker {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 0 auto 14px;
+    }
+
+    .mode-btn {
+      min-height: 52px;
+      padding: 10px 12px;
+      border: 2px solid #b9cede;
+      border-radius: 13px;
+      color: var(--navy);
+      background: rgba(255,255,255,.88);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
+    }
+
+    .mode-btn:hover { transform: translateY(-1px); border-color: var(--blue); }
+    .mode-btn:focus-visible, .action:focus-visible, input:focus-visible { outline: 3px solid rgba(25,118,210,.28); outline-offset: 2px; }
+    .mode-btn.active { border-color: var(--blue); color: #fff; background: var(--blue); box-shadow: 0 6px 16px rgba(25,118,210,.24); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      padding: 10px 8px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      text-align: center;
+      background: rgba(255,255,255,.82);
+    }
+
+    .stat-label { display: block; color: var(--muted); font-size: .76rem; font-weight: 750; text-transform: uppercase; letter-spacing: .055em; }
+    .stat-value { display: block; margin-top: 2px; color: var(--navy); font-size: 1.35rem; font-weight: 900; line-height: 1; }
+
+    .practice-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(178, 202, 221, .9);
+      border-radius: 22px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .card-topline { height: 7px; background: linear-gradient(90deg, var(--blue), #4ea6ef 55%, #2ebd73); }
+
+    .card-content { padding: clamp(22px, 5vw, 42px); }
+
+    .question-label {
+      margin: 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: .86rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .expression {
+      display: flex;
+      min-height: 130px;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 2.4vw, 23px);
+      padding: 21px 4px 23px;
+      color: #0a253d;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.1rem, 7vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .mixed, .fraction-wrap { display: inline-flex; align-items: center; gap: .11em; }
+    .whole-part { line-height: 1; }
+
+    .fraction {
+      display: inline-grid;
+      grid-template-rows: auto auto;
+      min-width: 1.05em;
+      vertical-align: middle;
+      text-align: center;
+      font-size: .72em;
+      line-height: 1.02;
+    }
+
+    .fraction .num { padding: 0 .12em .08em; border-bottom: .065em solid currentColor; }
+    .fraction .den { padding: .08em .12em 0; }
+    .operator { color: var(--blue-dark); font-family: inherit; font-weight: 800; }
+
+    .answer-title {
+      margin: 0 0 14px;
+      text-align: center;
+      color: var(--navy);
+      font-size: 1.08rem;
+      font-weight: 850;
+    }
+
+    .answer-zone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 0 auto;
+    }
+
+    .input-group { text-align: center; }
+    .input-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: .76rem; font-weight: 800; }
+
+    input {
+      width: 94px;
+      height: 62px;
+      border: 2px solid #aec6da;
+      border-radius: 12px;
+      color: var(--navy);
+      background: #fbfdff;
+      text-align: center;
+      font-size: 1.65rem;
+      font-weight: 800;
+      appearance: textfield;
+    }
+
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { margin: 0; appearance: none; }
+    input:focus { border-color: var(--blue); background: #fff; }
+
+    .answer-fraction { display: grid; gap: 5px; align-items: center; }
+    .answer-fraction input { width: 82px; height: 54px; }
+    .fraction-line { height: 3px; border-radius: 99px; background: var(--navy); }
+
+    .feedback {
+      display: flex;
+      min-height: 58px;
+      align-items: center;
+      justify-content: center;
+      margin: 22px auto 16px;
+      padding: 11px 16px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    .feedback.neutral { color: var(--muted); background: #f3f7fa; }
+    .feedback.correct { color: var(--green); background: var(--green-bg); }
+    .feedback.incorrect { color: var(--red); background: var(--red-bg); }
+
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .action {
+      min-height: 54px;
+      border: 0;
+      border-radius: 13px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    .action:hover { filter: brightness(.97); transform: translateY(-1px); }
+    .action:active { transform: translateY(1px); }
+    .primary { color: #fff; background: var(--blue); }
+    .secondary { color: var(--navy); border: 2px solid #bfd1df; background: #edf5fb; }
+
+    .tip { margin: 16px 0 0; color: var(--muted); text-align: center; font-size: .84rem; }
+
+    .burst {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      pointer-events: none;
+      animation: burst .7s ease-out forwards;
+    }
+
+    @keyframes burst {
+      from { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+      to { opacity: 0; transform: translate(var(--x), var(--y)) rotate(230deg) scale(.3); }
+    }
+
+    @keyframes nudge {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .nudge { animation: nudge .28s ease; }
+
+    @media (max-width: 620px) {
+      .app { width: min(100% - 18px, 520px); padding-top: 16px; }
+      header { margin-bottom: 14px; }
+      .subtitle { margin-top: 6px; }
+      .mode-picker { gap: 6px; }
+      .mode-btn { min-height: 48px; padding: 8px 4px; font-size: .88rem; }
+      .stats { gap: 6px; }
+      .stat { padding: 8px 4px; }
+      .stat-label { font-size: .65rem; }
+      .stat-value { font-size: 1.18rem; }
+      .practice-card { border-radius: 17px; }
+      .card-content { padding: 21px 14px 20px; }
+      .expression { min-height: 116px; gap: 8px; font-size: clamp(1.82rem, 10.2vw, 3rem); overflow-x: auto; justify-content: safe center; }
+      .answer-zone { gap: 11px; }
+      input { width: 80px; height: 58px; font-size: 1.45rem; }
+      .answer-fraction input { width: 70px; height: 49px; }
+      .actions { gap: 8px; }
+      .action { min-height: 51px; }
+    }
+
+    @media (max-width: 380px) {
+      .mode-btn { font-size: .8rem; }
+      .expression { font-size: 1.72rem; }
+      .answer-zone { gap: 8px; }
+      input { width: 72px; }
+      .answer-fraction input { width: 64px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Adding and Subtracting Fractions</h1>
+      <p class="subtitle">Common denominators</p>
+    </header>
+
+    <nav class="mode-picker" aria-label="Choose difficulty">
+      <button class="mode-btn active" data-mode="foundation" type="button">Foundation</button>
+      <button class="mode-btn" data-mode="core" type="button">Core</button>
+      <button class="mode-btn" data-mode="challenge" type="button">Challenge</button>
+    </nav>
+
+    <section class="stats" aria-label="Practice results">
+      <div class="stat"><span class="stat-label">Correct</span><span class="stat-value" id="correctCount">0</span></div>
+      <div class="stat"><span class="stat-label">Attempts</span><span class="stat-value" id="attemptCount">0</span></div>
+      <div class="stat"><span class="stat-label">Streak</span><span class="stat-value" id="streakCount">0</span></div>
+    </section>
+
+    <section class="practice-card" id="practiceCard">
+      <div class="card-topline"></div>
+      <div class="card-content">
+        <p class="question-label" id="questionLabel">Foundation question</p>
+        <div class="expression" id="expression" aria-live="polite"></div>
+
+        <p class="answer-title">Write your answer in simplest form</p>
+        <div class="answer-zone" id="answerZone">
+          <div class="input-group">
+            <label class="input-label" for="wholeInput">Whole number</label>
+            <input id="wholeInput" type="number" min="0" step="1" inputmode="numeric" aria-label="Whole number" placeholder="0">
+          </div>
+          <div class="input-group">
+            <span class="input-label">Fraction</span>
+            <div class="answer-fraction">
+              <input id="numeratorInput" type="number" min="0" step="1" inputmode="numeric" aria-label="Numerator" placeholder="0">
+              <div class="fraction-line" aria-hidden="true"></div>
+              <input id="denominatorInput" type="number" min="1" step="1" inputmode="numeric" aria-label="Denominator" placeholder="1">
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback neutral" id="feedback" role="status" aria-live="polite">Enter the whole-number part, fraction part, or both.</div>
+
+        <div class="actions">
+          <button class="action primary" id="checkBtn" type="button">Check Answer</button>
+          <button class="action secondary" id="newBtn" type="button">New Question</button>
+        </div>
+        <p class="tip">Press Enter to check your answer.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const $ = (selector) => document.querySelector(selector);
+      const expressionEl = $('#expression');
+      const feedbackEl = $('#feedback');
+      const cardEl = $('#practiceCard');
+      const answerZone = $('#answerZone');
+      const wholeInput = $('#wholeInput');
+      const numeratorInput = $('#numeratorInput');
+      const denominatorInput = $('#denominatorInput');
+      const checkBtn = $('#checkBtn');
+      const newBtn = $('#newBtn');
+      const questionLabel = $('#questionLabel');
+
+      const state = {
+        mode: 'foundation',
+        current: null,
+        answered: false,
+        correct: 0,
+        attempts: 0,
+        streak: 0,
+        recent: { foundation: [], core: [], challenge: [] },
+        recentSet: { foundation: new Set(), core: new Set(), challenge: new Set() }
+      };
+
+      const DENOMINATORS = {
+        foundation: [3, 4, 5, 6, 7, 8, 9, 10],
+        core: [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15],
+        challenge: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20]
+      };
+
+      const HISTORY_LIMIT = 300;
+      const SOURCE_EXAMPLES = new Set([
+        '3/4+1/4', '14/5-6/5', '8/8-3/8', '8/7-3/7',
+        '2/9+8/9', '8/5+7/5', '9/8-6/8', '13/5-9/5',
+        '3/3+4/3+8/3', '17/7-12/7', '20/5-6/5-13/5', '34/15-26/15'
+      ]);
+      const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+      const pick = (items) => items[randInt(0, items.length - 1)];
+      const chance = (probability) => Math.random() < probability;
+
+      function gcd(a, b) {
+        a = Math.abs(a);
+        b = Math.abs(b);
+        while (b) [a, b] = [b, a % b];
+        return a || 1;
+      }
+
+      function term(units, denominator) {
+        return { units, denominator };
+      }
+
+      function isMixed(value) {
+        return value.units > value.denominator;
+      }
+
+      function valueSignature(question) {
+        return question.terms.map((item, index) => `${index ? question.ops[index - 1] : ''}${item.units}/${item.denominator}`).join('');
+      }
+
+      function evaluate(question) {
+        return question.terms.reduce((total, item, index) => {
+          if (index === 0) return item.units;
+          return question.ops[index - 1] === '+' ? total + item.units : total - item.units;
+        }, 0);
+      }
+
+      function validQuestion(question) {
+        if (!question || question.terms.length !== question.ops.length + 1) return false;
+        const denominator = question.terms[0].denominator;
+        if (!question.terms.every(item => item.denominator === denominator && Number.isInteger(item.units) && item.units > 0)) return false;
+        let running = question.terms[0].units;
+        for (let i = 1; i < question.terms.length; i++) {
+          running += question.ops[i - 1] === '+' ? question.terms[i].units : -question.terms[i].units;
+          if (running < 0) return false;
+        }
+        return evaluate(question) > 0;
+      }
+
+      function makeFoundation() {
+        const d = pick(DENOMINATORS.foundation);
+        const type = pick(['ffAdd', 'ffSub', 'mixedAddFraction', 'mixedSubFraction', 'mixedAddMixed', 'mixedSubMixed', 'wholeSubFraction']);
+        let a, b;
+
+        if (type === 'ffAdd') {
+          a = randInt(1, d - 1);
+          b = randInt(1, d - 1);
+          return { terms: [term(a, d), term(b, d)], ops: ['+'] };
+        }
+        if (type === 'ffSub') {
+          a = randInt(2, d - 1);
+          b = randInt(1, a - 1);
+          return { terms: [term(a, d), term(b, d)], ops: ['-'] };
+        }
+        if (type === 'mixedAddFraction') {
+          a = randInt(1, 3) * d + randInt(1, d - 1);
+          b = randInt(1, d - 1);
+          return { terms: [term(a, d), term(b, d)], ops: ['+'] };
+        }
+        if (type === 'mixedSubFraction') {
+          const whole = randInt(1, 3);
+          const fraction = randInt(1, d - 1);
+          a = whole * d + fraction;
+          b = chance(.5) && fraction < d - 1 ? randInt(fraction + 1, d - 1) : randInt(1, fraction);
+          return { terms: [term(a, d), term(b, d)], ops: ['-'] };
+        }
+        if (type === 'mixedAddMixed') {
+          a = randInt(1, 2) * d + randInt(1, d - 1);
+          b = randInt(1, 2) * d + randInt(1, d - 1);
+          return { terms: [term(a, d), term(b, d)], ops: ['+'] };
+        }
+        if (type === 'mixedSubMixed') {
+          const firstWhole = randInt(2, 4);
+          const secondWhole = randInt(1, firstWhole - 1);
+          const firstFraction = randInt(1, d - 1);
+          const secondFraction = chance(.55) && firstFraction < d - 1 ? randInt(firstFraction + 1, d - 1) : randInt(1, firstFraction);
+          return { terms: [term(firstWhole * d + firstFraction, d), term(secondWhole * d + secondFraction, d)], ops: ['-'] };
+        }
+        a = randInt(1, 4) * d;
+        b = randInt(1, d - 1);
+        return { terms: [term(a, d), term(b, d)], ops: ['-'] };
+      }
+
+      function makeCore() {
+        const d = pick(DENOMINATORS.core);
+        const type = pick(['largerAdd', 'largerSub', 'addAdd', 'addSub', 'wholeAddSub', 'mixedSubAdd']);
+        let a, b, c;
+
+        if (type === 'largerAdd') {
+          a = randInt(2, 6) * d + randInt(1, d - 1);
+          b = randInt(1, 5) * d + randInt(1, d - 1);
+          return { terms: [term(a, d), term(b, d)], ops: ['+'] };
+        }
+        if (type === 'largerSub') {
+          a = randInt(3, 7) * d + randInt(1, d - 1);
+          b = randInt(1, Math.max(1, Math.floor(a / d) - 1)) * d + randInt(1, d - 1);
+          if (b >= a) b = a - randInt(1, d - 1);
+          return { terms: [term(a, d), term(b, d)], ops: ['-'] };
+        }
+        if (type === 'addAdd') {
+          a = randInt(1, 3) * d + randInt(1, d - 1);
+          b = randInt(1, 2) * d + randInt(1, d - 1);
+          c = randInt(1, d - 1);
+          return { terms: [term(a, d), term(b, d), term(c, d)], ops: ['+', '+'] };
+        }
+        if (type === 'addSub') {
+          a = randInt(1, 4) * d + randInt(1, d - 1);
+          b = randInt(1, 2) * d + randInt(1, d - 1);
+          c = randInt(1, Math.min(a + b - 1, 2 * d + d - 1));
+          return { terms: [term(a, d), term(b, d), term(c, d)], ops: ['+', '-'] };
+        }
+        if (type === 'wholeAddSub') {
+          a = randInt(1, 5) * d;
+          b = randInt(1, 2) * d + randInt(1, d - 1);
+          c = randInt(1, Math.min(a + b - 1, 2 * d + d - 1));
+          return { terms: [term(a, d), term(b, d), term(c, d)], ops: ['+', '-'] };
+        }
+        a = randInt(3, 6) * d + randInt(1, d - 1);
+        b = randInt(1, 3) * d + randInt(1, d - 1);
+        if (b >= a) b = a - randInt(1, Math.min(d - 1, a - 1));
+        c = randInt(1, d - 1);
+        return { terms: [term(a, d), term(b, d), term(c, d)], ops: ['-', '+'] };
+      }
+
+      function makeChallenge() {
+        const d = pick(DENOMINATORS.challenge);
+        const type = pick(['threeAdd', 'wholeSubSub', 'mixedSubSub', 'mixedSubMixed', 'addMixedSub', 'fourTerm']);
+        let a, b, c, e;
+
+        if (type === 'threeAdd') {
+          a = randInt(1, 4) * d;
+          b = randInt(1, 5) * d + randInt(1, d - 1);
+          c = randInt(1, 5) * d + randInt(1, d - 1);
+          return { terms: [term(a, d), term(b, d), term(c, d)], ops: ['+', '+'] };
+        }
+        if (type === 'wholeSubSub') {
+          a = randInt(4, 10) * d;
+          b = randInt(1, 3) * d + randInt(1, d - 2);
+          c = randInt(1, Math.max(1, a - b - 1));
+          return { terms: [term(a, d), term(b, d), term(c, d)], ops: ['-', '-'] };
+        }
+        if (type === 'mixedSubSub') {
+          a = randInt(5, 10) * d + randInt(1, d - 1);
+          b = randInt(1, 3) * d + randInt(1, d - 1);
+          c = randInt(1, Math.max(1, a - b - 1));
+          return { terms: [term(a, d), term(b, d), term(c, d)], ops: ['-', '-'] };
+        }
+        if (type === 'mixedSubMixed') {
+          const firstFraction = randInt(1, d - 2);
+          const secondFraction = randInt(firstFraction + 1, d - 1);
+          a = randInt(4, 10) * d + firstFraction;
+          b = randInt(1, Math.max(1, Math.floor(a / d) - 1)) * d + secondFraction;
+          if (b >= a) b -= d;
+          return { terms: [term(a, d), term(b, d)], ops: ['-'] };
+        }
+        if (type === 'addMixedSub') {
+          a = randInt(1, 5) * d + randInt(1, d - 1);
+          b = randInt(1, 4) * d + randInt(1, d - 1);
+          c = randInt(d + 1, a + b - 1);
+          return { terms: [term(a, d), term(b, d), term(c, d)], ops: ['+', '-'] };
+        }
+        a = randInt(6, 10) * d + randInt(1, d - 1);
+        b = randInt(1, 2) * d + randInt(1, d - 1);
+        c = randInt(1, 2) * d + randInt(1, d - 1);
+        const afterTwo = a - b + c;
+        e = randInt(1, Math.max(1, afterTwo - 1));
+        return { terms: [term(a, d), term(b, d), term(c, d), term(e, d)], ops: ['-', '+', '-'] };
+      }
+
+      function remember(signature) {
+        const list = state.recent[state.mode];
+        const set = state.recentSet[state.mode];
+        list.push(signature);
+        set.add(signature);
+        if (list.length > HISTORY_LIMIT) set.delete(list.shift());
+      }
+
+      function generateQuestion() {
+        const maker = state.mode === 'foundation' ? makeFoundation : state.mode === 'core' ? makeCore : makeChallenge;
+        let question;
+        let signature;
+        for (let tries = 0; tries < 200; tries++) {
+          question = maker();
+          signature = valueSignature(question);
+          if (validQuestion(question) && !SOURCE_EXAMPLES.has(signature) && !state.recentSet[state.mode].has(signature)) break;
+        }
+        remember(signature);
+        return question;
+      }
+
+      function fractionHTML(numerator, denominator) {
+        return `<span class="fraction" aria-label="${numerator} over ${denominator}"><span class="num">${numerator}</span><span class="den">${denominator}</span></span>`;
+      }
+
+      function termHTML(item) {
+        const whole = Math.floor(item.units / item.denominator);
+        const numerator = item.units % item.denominator;
+        if (numerator === 0) return `<span class="whole-part">${whole}</span>`;
+        if (whole === 0) return fractionHTML(numerator, item.denominator);
+        return `<span class="mixed"><span class="whole-part">${whole}</span>${fractionHTML(numerator, item.denominator)}</span>`;
+      }
+
+      function expressionHTML(question) {
+        return question.terms.map((item, index) => {
+          const operator = index ? `<span class="operator" aria-hidden="true">${question.ops[index - 1] === '+' ? '+' : '−'}</span>` : '';
+          return `${operator}${termHTML(item)}`;
+        }).join('');
+      }
+
+      function simplifiedAnswer(units, denominator) {
+        const divisor = gcd(units, denominator);
+        const reducedUnits = units / divisor;
+        const reducedDenominator = denominator / divisor;
+        return {
+          whole: Math.floor(reducedUnits / reducedDenominator),
+          numerator: reducedUnits % reducedDenominator,
+          denominator: reducedDenominator
+        };
+      }
+
+      function answerText(answer) {
+        if (answer.numerator === 0) return String(answer.whole);
+        if (answer.whole === 0) return `${answer.numerator}/${answer.denominator}`;
+        return `${answer.whole} ${answer.numerator}/${answer.denominator}`;
+      }
+
+      function readNonnegativeInteger(input, emptyValue) {
+        if (input.value.trim() === '') return emptyValue;
+        const value = Number(input.value);
+        return Number.isInteger(value) && value >= 0 ? value : null;
+      }
+
+      function clearInputs() {
+        wholeInput.value = '';
+        numeratorInput.value = '';
+        denominatorInput.value = '';
+      }
+
+      function updateStats() {
+        $('#correctCount').textContent = state.correct;
+        $('#attemptCount').textContent = state.attempts;
+        $('#streakCount').textContent = state.streak;
+      }
+
+      function setFeedback(message, type) {
+        feedbackEl.textContent = message;
+        feedbackEl.className = `feedback ${type}`;
+      }
+
+      function newQuestion() {
+        state.current = generateQuestion();
+        state.answered = false;
+        expressionEl.innerHTML = expressionHTML(state.current);
+        questionLabel.textContent = `${state.mode[0].toUpperCase()}${state.mode.slice(1)} question`;
+        clearInputs();
+        setFeedback('Enter the whole-number part, fraction part, or both.', 'neutral');
+        checkBtn.textContent = 'Check Answer';
+        wholeInput.focus({ preventScroll: true });
+      }
+
+      function celebrate() {
+        const colors = ['#1976d2', '#2ebd73', '#e8a317', '#7756d8'];
+        for (let i = 0; i < 18; i++) {
+          const piece = document.createElement('span');
+          piece.className = 'burst';
+          piece.style.left = `${45 + Math.random() * 10}%`;
+          piece.style.top = '52%';
+          piece.style.background = pick(colors);
+          piece.style.setProperty('--x', `${randInt(-170, 170)}px`);
+          piece.style.setProperty('--y', `${randInt(-130, 100)}px`);
+          cardEl.appendChild(piece);
+          setTimeout(() => piece.remove(), 750);
+        }
+      }
+
+      function checkAnswer() {
+        if (state.answered) {
+          newQuestion();
+          return;
+        }
+
+        const whole = readNonnegativeInteger(wholeInput, 0);
+        const numerator = readNonnegativeInteger(numeratorInput, 0);
+        const denominator = readNonnegativeInteger(denominatorInput, null);
+        const hasWhole = wholeInput.value.trim() !== '';
+        const hasNumerator = numeratorInput.value.trim() !== '';
+        const hasDenominator = denominatorInput.value.trim() !== '';
+
+        if (!hasWhole && !hasNumerator && !hasDenominator) {
+          setFeedback('Enter an answer first.', 'incorrect');
+          wholeInput.focus();
+          return;
+        }
+        if (whole === null || numerator === null || (hasDenominator && denominator === null)) {
+          setFeedback('Use whole numbers of 0 or greater in each box.', 'incorrect');
+          return;
+        }
+        if ((hasNumerator || hasDenominator) && (!hasNumerator || !hasDenominator)) {
+          setFeedback('Complete both the numerator and denominator.', 'incorrect');
+          (hasNumerator ? denominatorInput : numeratorInput).focus();
+          return;
+        }
+        if (hasDenominator && denominator === 0) {
+          setFeedback('The denominator cannot be 0.', 'incorrect');
+          denominatorInput.focus();
+          return;
+        }
+        if (hasNumerator && numerator >= denominator) {
+          setFeedback('Write an improper fraction as a mixed number.', 'incorrect');
+          numeratorInput.focus();
+          return;
+        }
+
+        const expectedUnits = evaluate(state.current);
+        const expectedDenominator = state.current.terms[0].denominator;
+        const userDenominator = hasNumerator ? denominator : 1;
+        const userUnits = whole * userDenominator + (hasNumerator ? numerator : 0);
+        const equivalent = userUnits * expectedDenominator === expectedUnits * userDenominator;
+        const reduced = !hasNumerator || gcd(numerator, denominator) === 1;
+
+        state.attempts++;
+        if (equivalent && reduced) {
+          state.correct++;
+          state.streak++;
+          state.answered = true;
+          setFeedback('Correct! Well done.', 'correct');
+          checkBtn.textContent = 'Next Question';
+          celebrate();
+        } else {
+          state.streak = 0;
+          if (equivalent) {
+            setFeedback('That value is correct, but the fraction can be simplified.', 'incorrect');
+          } else {
+            setFeedback(`Not quite. Try again — the denominators in the question already match.`, 'incorrect');
+          }
+          answerZone.classList.remove('nudge');
+          void answerZone.offsetWidth;
+          answerZone.classList.add('nudge');
+        }
+        updateStats();
+      }
+
+      document.querySelectorAll('.mode-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          state.mode = button.dataset.mode;
+          document.querySelectorAll('.mode-btn').forEach(item => item.classList.toggle('active', item === button));
+          newQuestion();
+        });
+      });
+
+      checkBtn.addEventListener('click', checkAnswer);
+      newBtn.addEventListener('click', newQuestion);
+      [wholeInput, numeratorInput, denominatorInput].forEach(input => {
+        input.addEventListener('keydown', event => {
+          if (event.key === 'Enter') checkAnswer();
+        });
+      });
+
+      newQuestion();
+    })();
+  </script>
+</body>
+</html>
