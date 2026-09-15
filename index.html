@@ -315,7 +315,7 @@
         <p class="question-label" id="questionLabel">Foundation question</p>
         <div class="expression" id="expression" aria-live="polite"></div>
 
-        <p class="answer-title">Write your answer in simplest form</p>
+        <p class="answer-title">Write your answer</p>
         <div class="answer-zone" id="answerZone">
           <div class="input-group">
             <label class="input-label" for="wholeInput">Whole number</label>
@@ -702,10 +702,9 @@
         const userDenominator = hasNumerator ? denominator : 1;
         const userUnits = whole * userDenominator + (hasNumerator ? numerator : 0);
         const equivalent = userUnits * expectedDenominator === expectedUnits * userDenominator;
-        const reduced = !hasNumerator || gcd(numerator, denominator) === 1;
 
         state.attempts++;
-        if (equivalent && reduced) {
+        if (equivalent) {
           state.correct++;
           state.streak++;
           state.answered = true;
@@ -714,11 +713,7 @@
           celebrate();
         } else {
           state.streak = 0;
-          if (equivalent) {
-            setFeedback('That value is correct, but the fraction can be simplified.', 'incorrect');
-          } else {
-            setFeedback(`Not quite. Try again — the denominators in the question already match.`, 'incorrect');
-          }
+          setFeedback(`Not quite. Try again — the denominators in the question already match.`, 'incorrect');
           answerZone.classList.remove('nudge');
           void answerZone.offsetWidth;
           answerZone.classList.add('nudge');
